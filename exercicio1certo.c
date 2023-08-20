@@ -29,7 +29,7 @@ int main() {
 
     cria_indice(indices, numeroIndices, vetor, tam_vetor);
     
-   
+    // imprimir os indices criados
     int i;
     for (i = 0; i < numeroIndices; i++) {
         printf("Indice: %d, Valor: %d\n", indices[i].index, indices[i].value);
@@ -70,7 +70,8 @@ int busca_sequencial_indexada(int vetor[], const struct IndexValue indices[], in
 void cria_indice(struct IndexValue indice[], int tam_indice, int v[], int n) {
     int pos, i = 0;
     while (i < tam_indice) {
-        pos = i * (n - 1) / (tam_indice - 1); 
+        pos = i * (n - 1) / (tam_indice - 1); // Ajuste no cálculo do índice
+        indice[i].index = pos;
         indice[i].value = v[pos];
         i++;
     }
