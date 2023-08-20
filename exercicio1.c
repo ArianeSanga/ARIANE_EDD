@@ -4,92 +4,84 @@
 #define TRUE 1
 #define FALSE 0
 
+struct IndexValue {
+    int index;
+    int value;
+};
 
-// Função para realizar a busca sequencial indexada
-int busca_sequencial_indexada(int chave, int indices[], int num_indices, int dados[]);
-
-void carrega_vetor_aleatorio(int colecao[], int tamanho, int qtd_digitos);
-
+int busca_sequencial_indexada(int vetor[], const struct IndexValue indices[], int n, int tam_indice, int chave);
+void cria_indice(struct IndexValue indice[], int tam_indice, int v[], int n);
 void carrega_vetor_ordenado(int colecao[], int valor_inicial, int tamanho);
 
-void imprime_vetor(int colecao[], int tamanho);
-
-
 int main() {
+    int vetor[1000000];
+    int tam_vetor = 1000000;
 
-    int vetor[10];
+    carrega_vetor_ordenado(vetor, 0, tam_vetor);
 
-    /*carrega_vetor_aleatorio(vetor, 10, 2);
 
-    imprime_vetor(vetor, 10);*/
+    int numeroIndices = 5;
+    struct IndexValue *indices = (struct IndexValue *)malloc(numeroIndices * sizeof(struct IndexValue));
+    if (indices == NULL) {
+        printf("Falha na alocação de memória.\n");
+        return 1;
+    }
 
-     carrega_vetor_ordenado(vetor, 0, 10);
+    cria_indice(indices, numeroIndices, vetor, tam_vetor);
+    
+   
+    int i;
+    for (i = 0; i < numeroIndices; i++) {
+        printf("Indice: %d, Valor: %d\n", indices[i].index, indices[i].value);
+    }
+    
 
-     imprime_vetor(vetor, 10);
+    int resultado = busca_sequencial_indexada(vetor, indices, tam_vetor, numeroIndices, 35);
+
+    if (resultado == -1) {
+        printf("Nao esta no vetor");
+    } else {
+        printf("Esta no vetor, no indice %d", resultado);
+        printf("\nValor: %d", vetor[resultado]);
+    }
 
     return 0;
 }
 
-int busca_sequencial_indexada(int chave, int indices[], int num_indices, int dados[]) {
-    // Encontrar o índice na tabela auxiliar que é menor ou igual à chave
-    int indice_aproximado = -1;
-    for (int i = 0; i < num_indices; i++) {
-        if (indices[i] <= chave) {
-            indice_aproximado = i;
-        } else {
-            break;
-        }
+int busca_sequencial_indexada(int vetor[], const struct IndexValue indices[], int n, int tam_indice, int x) {
+    int indiceAproximado;
+    for (indiceAproximado = 0; indiceAproximado < tam_indice && indices[indiceAproximado].value <= x; indiceAproximado++);
+    indiceAproximado--;
+
+    if (indiceAproximado < 0)
+        indiceAproximado = 0;
+
+    while (indiceAproximado < n && vetor[indiceAproximado] < x) {
+        indiceAproximado++;
     }
-
-    if (indice_aproximado == -1) {
-        return -1; // Chave é menor que todos os índices
-    }
-
-    // Realizar a busca sequencial a partir do índice aproximado
-    int inicio = indices[indice_aproximado];
-    int fim = (indice_aproximado < num_indices - 1) ? indices[indice_aproximado + 1] - 1 : num_indices - 1;
-
-    for (int i = inicio; i <= fim; i++) {
-        if (dados[i] == chave) {
-            return i; // Chave encontrada
-        }
-    }
-
-    return -1; // Chave não encontrada
-}
-
-void carrega_vetor_aleatorio(int colecao[], int tamanho, int qtd_digitos)
-{
-    int i, digitos;
-
-    for (i = 1, digitos = 10; i < qtd_digitos; i++)
-    {
-        digitos *= 10;
-    }
-
-    srand((unsigned)time(NULL));
-    for (i = 0; i < tamanho; i++)
-    {
-        colecao[i] = rand() % digitos;
+    
+    if (indiceAproximado < n && vetor[indiceAproximado] == x) {
+        return indiceAproximado;
+    } else {
+        return -1;
     }
 }
 
-void carrega_vetor_ordenado(int colecao[], int valor_inicial, int tamanho)
-{
+void cria_indice(struct IndexValue indice[], int tam_indice, int v[], int n) {
+    int pos, i = 0;
+    while (i < tam_indice) {
+        pos = i * (n - 1) / (tam_indice - 1); // Ajuste no cálculo do índice
+        indice[i].index = pos;
+        indice[i].value = v[pos];
+        i++;
+    }
+
+}
+
+void carrega_vetor_ordenado(int colecao[], int valor_inicial, int tamanho) {
     int i;
     srand((unsigned)time(NULL));
-    for (colecao[0] = valor_inicial, i = 1; i < tamanho; i++)
-    {
+    for (colecao[0] = valor_inicial, i = 1; i < tamanho; i++) {
         colecao[i] = colecao[i - 1] + (rand() % 10);
     }
-}
-
-void imprime_vetor(int colecao[], int tamanho)
-{
-    int i = 0;
-    for (i = 0; i < tamanho; i++)
-    {
-        printf("%d, ", colecao[i]);
-    }
-    printf("\n");
 }
